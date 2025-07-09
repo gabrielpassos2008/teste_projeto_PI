@@ -2,7 +2,10 @@ import sqlite3
 from datetime import datetime
 def criar_banco():
     conexao = sqlite3.connect('banco_chegando_pi.db')
-    cursor = conexao.cursor()
+    criar_tab_usuario_adm(conexao)
+    criar_tab_empresa_guincho(conexao)
+    criar_tab_seguradora(conexao)
+    criar_tab_solicitacao_de_guincho(conexao)
 #criação de tabela usuario_adm
 def criar_tab_usuario_adm(conn):
     cursor = conn.cursor()
