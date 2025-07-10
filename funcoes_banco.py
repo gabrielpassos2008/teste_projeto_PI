@@ -8,6 +8,12 @@ class Usuario():
 
 usuario = Usuario()
 
+def test_novo_usuario():
+    usr = Usuario()
+    assert usr.logado == False
+    assert usr.id != None
+
+
 def adicionar_usuario_adm(senha,email,tipo):
     conexao = sqlite3.connect('banco_chegando_pi.db')
     cursor = conexao.cursor()
@@ -19,27 +25,21 @@ def adicionar_usuario_adm(senha,email,tipo):
     cursor.close()
     conexao.close()
 
-def adicionar_seguradora(nome,email,senha):
-    conexao = sqlite3.connect('banco_chegando_pi.db')
-    cursor = conexao.cursor()
+def adicionar_seguradora(conn,nome,email,senha):
+    cursor = conn.cursor()
     cursor.execute('''
     INSERT INTO seguradora (nome,email,senha)
     VALUES(?,?,?)
     ''',(nome,email,senha))
-    conexao.commit()
-    cursor.close()
-    conexao.close()
+    conn.commit()
 
-def adicionar_empresa_de_guincho(nome,email,senha):
-    conexao = sqlite3.connect('banco_chegando_pi.db')
-    cursor = conexao.cursor()
+def adicionar_empresa_de_guincho(conn,nome,email,senha):
+    cursor = conn.cursor()
     cursor.execute('''
     INSERT INTO empresa_guincho (nome,email,senha)
     VALUES(?,?,?)
     ''',(nome,email,senha))
-    conexao.commit()
-    cursor.close()
-    conexao.close()
+    conn.commit()
 
 def inserir_solicitacao_de_guincho(placa_carro, local_de_origem, local_de_destino,status, data_hora,id_guincho):
     conexao = sqlite3.connect('banco_chegando_pi.db')
@@ -78,23 +78,18 @@ def autorizar_seguradora(id_aprovador,status, id_empresa):
         print('nao achou')
         return False
     
-def autorizar_empresa_guincho(id_aprovador,status, id_guincho):
-    conexao = sqlite3.connect('banco_chegando_pi.db')
-    cursor = conexao.cursor()
+def autorizar_empresa_guincho(conn,id_aprovador,status, id_guincho):
+    cursor = conn.cursor()
     cursor.execute('''
     UPDATE empresa_guincho
     SET id_usuario_aprovador = ?, status_aprovacao = ?
     WHERE id = ?
     ''', (id_aprovador,status, id_guincho))
     resultado = cursor.rowcount
-    conexao.commit()
-    cursor.close()
-    conexao.close()
+    conn.commit()
     if resultado > 0:
-        print('achou')
         return True
     else:
-        print('nao achou')
         return False
     
 def login_empresa_de_guincho(email,senha):
@@ -168,17 +163,14 @@ def buscar_solicitacoes_guincho():
     conexao.close()
     return resultados
 
-def buscar_empresa_guincho():
-    conexao = sqlite3.connect('banco_chegando_pi.db')
-    cursor = conexao.cursor()
+def buscar_empresa_guincho(conn):
+    cursor = conn.cursor()
     cursor.execute('''
     SELECT id,nome
     FROM empresa_guincho
     WHERE status_aprovacao = 1
     ''')
     resultados = cursor.fetchall()
-    cursor.close()
-    conexao.close()
     return resultados
 
 def aceitar_pedido(status,id):
